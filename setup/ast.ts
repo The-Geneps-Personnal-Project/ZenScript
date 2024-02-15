@@ -1,12 +1,17 @@
+// deno-lint-ignore-file
 export type NodeType = 
+    // STATEMENTS
     | 'Program'
+    | 'VariablesDeclaration'
+
+    // EXPRESSIONS
     | 'NumericLiteral'
     | 'Identifier'
     | 'BinaryExpression'
+    | 'AssignmentExpression'
     | 'UnaryExpression'
     | 'CallExpression'
     | 'FunctionDeclaration'
-    | 'NullLiteral'
 
 export interface Statement {
     kind: NodeType;
@@ -15,6 +20,13 @@ export interface Statement {
 export interface Program extends Statement {
     kind: 'Program';
     body: Statement[];
+}
+
+export interface VariablesDeclaration extends Statement {
+    kind: 'VariablesDeclaration';
+    constant: boolean;
+    identifier: string;
+    value?: Expression;
 }
 
 export interface Expression extends Statement {}
@@ -29,6 +41,10 @@ export interface Identifier extends Expression {
     symbol: string;
 }
 
+/**
+ * A binary expression is an expression that consists of a left-hand side, a right-hand side, and an operator.
+ * - Supported operators: +, -, *, /, %
+ */
 export interface BinaryExpression extends Expression {
     kind: 'BinaryExpression';
     operator: string;
@@ -55,7 +71,8 @@ export interface FunctionDeclaration extends Expression {
     body: Statement[];
 }
 
-export interface NullLiteral extends Expression {
-    kind: 'NullLiteral';
-    value: null;
+export interface AssignmentExpression extends Expression {
+    kind: 'AssignmentExpression';
+    assign: Expression;
+    value: Expression;
 }

@@ -1,12 +1,12 @@
 export enum TokenType {
-    Null,
     Number,
     Identifier,
     Equals,
+    Semicolon,
     OpenParen, 
     CloseParen,
     BinaryOperator,
-    Let,
+    Let, Const,
     EOF,
     Comma,
     OpenBrace,
@@ -15,7 +15,7 @@ export enum TokenType {
 
 const Keywords: Record<string, TokenType> = {
     let: TokenType.Let,
-    null: TokenType.Null,
+    const: TokenType.Const,
 }
 
 export interface Token {
@@ -120,6 +120,7 @@ export class Lexer {
             else if (this.peek() === '=') {this.advance(); this.tokens.push({ type: TokenType.Equals, value: "="})}
             else if (this.peek() === '(') {this.advance(); this.tokens.push({ type: TokenType.OpenParen, value: "("})}
             else if (this.peek() === ')') {this.advance(); this.tokens.push({ type: TokenType.CloseParen, value: ")"})}
+            else if (this.peek() === ';') {this.advance(); this.tokens.push({ type: TokenType.Semicolon, value: ";"})}
             else throw new Error('Unexpected token: ' + this.peek());
         }
         this.tokens.push({ type: TokenType.EOF, value: 'EndOfFile' });

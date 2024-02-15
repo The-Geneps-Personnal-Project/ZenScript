@@ -1,9 +1,16 @@
+// deno-lint-ignore-file
 import Parser from "./setup/parser.ts";
 import { evaluate } from "./runtime/interpreter.ts";
+import Environment from "./runtime/env.ts";
+import { MAKE_NUMBER, MAKE_NULL, MAKE_BOOL } from "./runtime/values.ts";
 repl();
 
 function repl() {
     const parser = new Parser();
+    const env = new Environment();
+    env.define("true", MAKE_BOOL(true), true);
+    env.define("false", MAKE_BOOL(false), true);
+    env.define("null", MAKE_NULL(), true);
     console.log("Welcome to the REPL! Type in your code and press enter to see the AST.");
     while (true) {
         const sourceCode = prompt("> ");
@@ -11,7 +18,7 @@ function repl() {
             break;
         }
         const ast = parser.produceAST(sourceCode);
-        const result = evaluate(ast);
+        const result = evaluate(ast, env);
         console.log(result);
     }
 }

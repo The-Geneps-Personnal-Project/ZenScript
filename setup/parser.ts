@@ -1,5 +1,6 @@
+// deno-lint-ignore-file
 import {Token, TokenType, Lexer} from './lexer.ts';
-import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, NullLiteral} from './ast.ts';
+import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression} from './ast.ts';
 
 export default class Parser {
     private tokens: Token[] = [];
@@ -42,11 +43,45 @@ export default class Parser {
     }
 
     private parse_statement(): Statement {
-        return this.parse_expression();
+        switch (this.at().type) {
+            case TokenType.Let:
+            case TokenType.Const:
+                return this.parse_variable_declaration();
+            default:
+                return this.parse_expression();
+                Deno.exit(1);
+        }
+    }
+
+    private parse_variable_declaration(): Statement {
+        const constant = this.consume().type == TokenType.Const;
+        const identifier = this.expect(TokenType.Identifier, "Expected identifier Let or Const keyword").value;
+
+        if (this.at().type == TokenType.Semicolon) {
+            this.consume();
+            if (constant) throw "Constant must be initialized";
+            return {kind: "VariablesDeclaration", identifier, constant: false} as VariablesDeclaration
+        }
+
+        this.expect(TokenType.Equals, "Expected equals sign");
+        const declaration = {kind: "VariablesDeclaration", constant, value: this.parse_expression(), identifier} as VariablesDeclaration;
+        this.expect(TokenType.Semicolon, "Expected semicolon at the end of variable declaration statement");
+        return declaration;
     }
 
     private parse_expression(): Expression {
-        return this.parse_additive_expression();
+        return this.parse_assignment_expression();
+    }
+
+    private parse_assignment_expression(): Expression {
+        const left = this.parse_additive_expression();
+
+        if (this.at().type == TokenType.Equals) {
+            this.consume();
+            const value = this.parse_assignment_expression();
+            return {value, assign: left, kind: "AssignmentExpression"} as AssignmentExpression;
+        }
+        return left;
     }
 
     private parse_multiplicative_expression(): Expression {
@@ -74,9 +109,6 @@ export default class Parser {
         switch (token) {
             case TokenType.Identifier:
                 return { kind: "Identifier", symbol: this.consume().value } as Identifier;
-            case TokenType.Null:
-                this.consume();
-                return { kind: "NullLiteral", value: null } as NullLiteral;
             case TokenType.Number:
                 return { kind: "NumericLiteral", value: parseFloat(this.consume().value) } as NumericLiteral;
             case TokenType.OpenParen:
