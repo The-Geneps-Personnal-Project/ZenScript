@@ -2,6 +2,7 @@ import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral, Call
 import Environment from "../env.ts";
 import { MAKE_NULL, NumberValue, RuntimeValue, ObjectValue, NativeFunctionValue } from "../values.ts";
 import { evaluate } from "../interpreter.ts";
+import { FunctionValue } from "../values.ts";
 
 function evaluateNumericBinaryExpression(left: NumberValue, right: NumberValue, operator: string): NumberValue {
     let result: number;
@@ -55,10 +56,25 @@ export function evaluateCallExpression(expr: CallExpression, env: Environment): 
     const args = expr.arguments.map(arg => evaluate(arg, env));
     const fn = evaluate(expr.caller, env);
 
-    if (fn.type !== "nativeFunction") {
-        throw `Expected a function, got ${fn.type}`;
-    }
+    if (fn.type == "nativeFunction") {
+        const res = (fn as NativeFunctionValue).call(args, env);
+        return res;
+    } else if (fn.type == "function") {
+        const func = fn as FunctionValue;
+        const scope = new Environment(func.declarationEnv);
 
-    const res = (fn as NativeFunctionValue).call(args, env);
-    return res;
+        for (let i = 0; i < func.parameters.length; i++) {
+            //TODO: check if the number of arguments is correct
+            scope.define(func.parameters[i], args[i], false);
+        }
+
+        let result: RuntimeValue = MAKE_NULL();
+        for (const statement of func.body) {
+            result = evaluate(statement, scope);
+        }
+
+        return result
+    }
+    
+    throw `Invalid call expression ${JSON.stringify(expr)}`;
 }

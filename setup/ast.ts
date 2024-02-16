@@ -3,6 +3,7 @@ export type NodeType =
     // STATEMENTS
     | 'Program'
     | 'VariablesDeclaration'
+    | 'FunctionDeclaration'
 
     // LITTERALS
     | 'Property'
@@ -15,10 +16,6 @@ export type NodeType =
     | 'AssignmentExpression'
     | 'MemberExpression'
     | 'CallExpression'
-
-    // FUNCTIONS
-    | 'UnaryExpression'
-    | 'FunctionDeclaration'
 
 export interface Statement {
     kind: NodeType;
@@ -34,6 +31,15 @@ export interface VariablesDeclaration extends Statement {
     constant: boolean;
     identifier: string;
     value?: Expression;
+}
+
+export interface FunctionDeclaration extends Statement {
+    kind: 'FunctionDeclaration';
+    parameters: string[];
+    name: string;
+    body: Statement[];
+    // async : boolean; // TODO: Implement async functions
+    // arrow : boolean; // TODO: Implement arrow functions
 }
 
 export interface Expression extends Statement {}
@@ -59,23 +65,10 @@ export interface BinaryExpression extends Expression {
     right: Expression;
 }
 
-export interface UnaryExpression extends Expression {
-    kind: 'UnaryExpression';
-    operator: string;
-    argument: Expression;
-}
-
 export interface CallExpression extends Expression {
     kind: 'CallExpression';
     callee: Expression;
     arguments: Expression[];
-}
-
-export interface FunctionDeclaration extends Expression {
-    kind: 'FunctionDeclaration';
-    id: Identifier;
-    params: Identifier[];
-    body: Statement[];
 }
 
 export interface AssignmentExpression extends Expression {

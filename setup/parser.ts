@@ -47,9 +47,37 @@ export default class Parser {
             case TokenType.Let:
             case TokenType.Const:
                 return this.parse_variable_declaration();
+            case TokenType.Fn:
+                return this.parse_function_declaration();
             default:
                 return this.parse_expression();
         }
+    }
+
+    private parse_function_declaration(): FunctionDeclaration {
+        this.consume(); // Skip Fn
+        const name = this.expect(TokenType.Identifier, "Expected function name").value;
+
+        const args: string[] = [];
+        for (const arg of this.parse_arguments()) {
+            if (arg.kind !== "Identifier") throw "Expected identifier as function argument";
+            args.push((arg as Identifier).symbol);
+        }
+
+        this.expect(TokenType.OpenBrace, "Expected opening brace after function declaration");
+
+        const body: Statement[] = [];
+
+        while (this.at().type != TokenType.EOF && this.at().type != TokenType.CloseBrace) {
+            body.push(this.parse_statement());
+        }
+
+        this.expect(TokenType.CloseBrace, "Expected closing brace after function declaration");
+        const fn = {
+            body, name, parameters: args, kind: "FunctionDeclaration"
+        } as FunctionDeclaration;
+
+        return fn;
     }
 
     private parse_variable_declaration(): Statement {
