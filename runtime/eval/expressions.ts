@@ -1,6 +1,6 @@
-import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral } from "../../setup/ast.ts";
+import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral, CallExpression } from "../../setup/ast.ts";
 import Environment from "../env.ts";
-import { MAKE_NULL, NumberValue, RuntimeValue, ObjectValue } from "../values.ts";
+import { MAKE_NULL, NumberValue, RuntimeValue, ObjectValue, NativeFunctionValue } from "../values.ts";
 import { evaluate } from "../interpreter.ts";
 
 function evaluateNumericBinaryExpression(left: NumberValue, right: NumberValue, operator: string): NumberValue {
@@ -49,4 +49,16 @@ export function evaluateObjectExpression(obj: ObjectLiteral, env: Environment): 
         object.properties.set(key, runtimeValue);
     }
     return object;
+}
+
+export function evaluateCallExpression(expr: CallExpression, env: Environment): RuntimeValue {
+    const args = expr.arguments.map(arg => evaluate(arg, env));
+    const fn = evaluate(expr.caller, env);
+
+    if (fn.type !== "nativeFunction") {
+        throw `Expected a function, got ${fn.type}`;
+    }
+
+    const res = (fn as NativeFunctionValue).call(args, env);
+    return res;
 }
