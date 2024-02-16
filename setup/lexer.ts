@@ -1,16 +1,26 @@
 export enum TokenType {
+    // LITERALS
     Number,
     Identifier,
+
+    // KEYWORDS
+    Let, 
+    Const,
+
+    // OPERATORS
+    BinaryOperator,
     Equals,
+    Comma,
+    Dot,
+    Colon,
     Semicolon,
     OpenParen, 
     CloseParen,
-    BinaryOperator,
-    Let, Const,
+    OpenBrace, // {
+    CloseBrace, // }
+    OpenBracket, // [
+    CloseBracket, // ]
     EOF,
-    Comma,
-    OpenBrace,
-    CloseBrace,
 }
 
 const Keywords: Record<string, TokenType> = {
@@ -43,6 +53,7 @@ export class Lexer {
     }
 
     private isWhitespace(char: string): boolean {
+        // Check space, tab, newline, carriage return
         return /\s/.test(char);
     }
 
@@ -121,6 +132,13 @@ export class Lexer {
             else if (this.peek() === '(') {this.advance(); this.tokens.push({ type: TokenType.OpenParen, value: "("})}
             else if (this.peek() === ')') {this.advance(); this.tokens.push({ type: TokenType.CloseParen, value: ")"})}
             else if (this.peek() === ';') {this.advance(); this.tokens.push({ type: TokenType.Semicolon, value: ";"})}
+            else if (this.peek() === ',') {this.advance(); this.tokens.push({ type: TokenType.Comma, value: ","})}
+            else if (this.peek() === '.') {this.advance(); this.tokens.push({ type: TokenType.Dot, value: "."})}
+            else if (this.peek() === ':') {this.advance(); this.tokens.push({ type: TokenType.Colon, value: ":"})}
+            else if (this.peek() === '{') {this.advance(); this.tokens.push({ type: TokenType.OpenBrace, value: "{"})}
+            else if (this.peek() === '}') {this.advance(); this.tokens.push({ type: TokenType.CloseBrace, value: "}"})}
+            else if (this.peek() === '[') {this.advance(); this.tokens.push({ type: TokenType.OpenBracket, value: "["})}
+            else if (this.peek() === ']') {this.advance(); this.tokens.push({ type: TokenType.CloseBracket, value: "]"})}
             else throw new Error('Unexpected token: ' + this.peek());
         }
         this.tokens.push({ type: TokenType.EOF, value: 'EndOfFile' });

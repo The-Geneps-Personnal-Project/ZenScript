@@ -4,13 +4,20 @@ export type NodeType =
     | 'Program'
     | 'VariablesDeclaration'
 
-    // EXPRESSIONS
+    // LITTERALS
+    | 'Property'
+    | 'ObjectLiteral'
     | 'NumericLiteral'
     | 'Identifier'
     | 'BinaryExpression'
+
+    // EXPRESSIONS & STATEMENTS
     | 'AssignmentExpression'
-    | 'UnaryExpression'
+    | 'MemberExpression'
     | 'CallExpression'
+
+    // FUNCTIONS
+    | 'UnaryExpression'
     | 'FunctionDeclaration'
 
 export interface Statement {
@@ -75,4 +82,28 @@ export interface AssignmentExpression extends Expression {
     kind: 'AssignmentExpression';
     assign: Expression;
     value: Expression;
+}
+
+export interface Property extends Statement {
+    kind: 'Property';
+    key: string;
+    value?: Expression;
+}
+
+export interface ObjectLiteral extends Expression {
+    kind: 'ObjectLiteral';
+    properties: Property[];
+}
+
+export interface MemberExpression extends Expression {
+    kind: 'MemberExpression';
+    object: Expression;
+    property: Expression;
+    computed: boolean;
+}
+
+export interface CallExpression extends Expression {
+    kind: 'CallExpression';
+    caller: Expression;
+    arguments: Expression[];
 }

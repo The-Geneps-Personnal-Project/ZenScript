@@ -1,4 +1,14 @@
 import {RuntimeValue} from "./values.ts";
+import {MAKE_BOOL, MAKE_NULL} from "./values.ts";
+
+export function createGlobalEnvironment() {
+    const env = new Environment();
+    env.define("true", MAKE_BOOL(true), true);
+    env.define("false", MAKE_BOOL(false), true);
+    env.define("null", MAKE_NULL(), true);
+
+    return env;
+}
 
 export default class Environment {
     private parent?: Environment;
@@ -6,6 +16,7 @@ export default class Environment {
     private constants: Set<string>;
 
     constructor(parentEnv?: Environment) {
+        const global = parentEnv ? true: false;
         this.parent = parentEnv;
         this.variables = new Map();
         this.constants = new Set();
