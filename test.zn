@@ -1,0 +1,15 @@
+
+const obj = {
+  name: "John",
+  age: 30,
+  isMarried: false
+};
+
+obj.print = function() {
+  console.log("Hello");
+};
+
+obj.print()
+print(Str("Salut"))
+print(Number("12"))
+print(typeof(true))

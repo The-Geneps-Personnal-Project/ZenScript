@@ -17,6 +17,18 @@ export function createGlobalEnvironment() {
         return MAKE_NUMBER(Date.now());
     }), true);
 
+    env.define("typeof", MAKE_NATIVE_FUNCTION((args) => {
+        return { type: "string", value: args[0].type };
+    }), true);
+
+    env.define("Str", MAKE_NATIVE_FUNCTION((args) => {
+        return { type: "string", value: args[0].value.toString() };
+    }), true);
+
+    env.define("Number", MAKE_NATIVE_FUNCTION((args) => {
+        return { type: "number", value: Number(args[0].value) };
+    }), true);
+
     return env;
 }
 

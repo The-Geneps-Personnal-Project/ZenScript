@@ -4,6 +4,7 @@ import Environment from "./env.ts";
 export type ValueType = "null" | "number" | "boolean" | "object" | "nativeFunction" | "function" | "string";
 
 export interface RuntimeValue {
+    value: any;
     type: ValueType;
 }
 

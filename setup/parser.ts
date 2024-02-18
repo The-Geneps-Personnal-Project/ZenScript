@@ -82,7 +82,7 @@ export default class Parser {
 
     private parse_variable_declaration(): Statement {
         const constant = this.consume().type == TokenType.Const;
-        const identifier = this.expect(TokenType.Identifier, "Expected identifier Let or Const keyword").value;
+        const identifier = this.expect(TokenType.Identifier, "Expected identifier Let/Const or Prev keyword").value;
 
         if (this.at().type == TokenType.Semicolon) {
             this.consume();

@@ -8,6 +8,7 @@ export enum TokenType {
     Let, 
     Const,
     Fn,
+    Previous,
 
     // OPERATORS
     BinaryOperator,
@@ -29,6 +30,7 @@ const Keywords: Record<string, TokenType> = {
     let: TokenType.Let,
     const: TokenType.Const,
     fn: TokenType.Fn,
+    prev: TokenType.Previous,
 }
 
 export interface Token {
