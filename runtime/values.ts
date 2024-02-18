@@ -1,7 +1,7 @@
 import { Statement } from "../setup/ast.ts";
 import Environment from "./env.ts";
 
-export type ValueType = "null" | "number" | "boolean" | "object" | "nativeFunction" | "function";
+export type ValueType = "null" | "number" | "boolean" | "object" | "nativeFunction" | "function" | "string";
 
 export interface RuntimeValue {
     type: ValueType;
@@ -39,6 +39,11 @@ export interface FunctionValue extends RuntimeValue {
     parameters: string[];
     declarationEnv: Environment;
     body: Statement[];
+}
+
+export interface StringValue extends RuntimeValue {
+    type: "string";
+    value: string;
 }
 
 export function MAKE_NATIVE_FUNCTION(call: FunctionCall) {

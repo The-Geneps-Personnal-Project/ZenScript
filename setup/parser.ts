@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
 import {Token, TokenType, Lexer} from './lexer.ts';
-import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression, Property, ObjectLiteral, MemberExpression} from './ast.ts';
+import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression, Property, ObjectLiteral, MemberExpression, StringLiteral} from './ast.ts';
 
 export default class Parser {
     private tokens: Token[] = [];
@@ -237,6 +237,8 @@ export default class Parser {
                 return { kind: "Identifier", symbol: this.consume().value } as Identifier;
             case TokenType.Number:
                 return { kind: "NumericLiteral", value: parseFloat(this.consume().value) } as NumericLiteral;
+            case TokenType.String:
+                return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
             case TokenType.OpenParen:
                 this.consume();
                 const expression = this.parse_expression();

@@ -1,6 +1,6 @@
 import { AssignmentExpression, BinaryExpression, Identifier, ObjectLiteral, CallExpression } from "../../setup/ast.ts";
 import Environment from "../env.ts";
-import { MAKE_NULL, NumberValue, RuntimeValue, ObjectValue, NativeFunctionValue } from "../values.ts";
+import { MAKE_NULL, NumberValue, RuntimeValue, ObjectValue, NativeFunctionValue, StringValue } from "../values.ts";
 import { evaluate } from "../interpreter.ts";
 import { FunctionValue } from "../values.ts";
 
@@ -25,11 +25,43 @@ function evaluateNumericBinaryExpression(left: NumberValue, right: NumberValue, 
     return { type: "number", value: result }
 }
 
+function evaluateStringBinaryExpression(left: StringValue, right: StringValue, operator: string): StringValue {
+    if (operator !== "+") throw new Error("Invalid operator for string");
+    const result = left.value + right.value;
+    return { type: "string", value: result };
+}
+
+function evaluateStringNumericBinaryExpression(left: StringValue | NumberValue, right: NumberValue | StringValue, operator: string): StringValue | NumberValue {
+    let result: string | number = "";
+    switch (operator) {
+        case "+":
+            result = String(left.value) + String(right.value);
+            break;
+        case "-":
+            result = Number(left.value) - Number(right.value);
+            break;
+        case "*":
+            result = Number(left.value) * Number(right.value);
+            break;
+        case "/":
+            result = Number(left.value) / Number(right.value);
+            break;
+    }
+
+    if (typeof result === "string") return { type: "string", value: result };
+    return { type: "number", value: result };
+}
+
 export function evaluateBinaryExpression(binExp: BinaryExpression, env: Environment): RuntimeValue {
     const left = evaluate(binExp.left, env);
     const right = evaluate(binExp.right, env);
     if (left.type == "number" && right.type == "number") {
         return evaluateNumericBinaryExpression(left as NumberValue, right as NumberValue, binExp.operator);
+    } else if (left.type == "string" && right.type == "string") {
+        return evaluateStringBinaryExpression(left as StringValue, right as StringValue, binExp.operator);
+    } else if ((left.type == "string" || left.type == "number") || (right.type == "string" || right.type == "number")) {
+        if (binExp.operator !== "+" && (Number.isNaN(Number((left as StringValue).value)) || Number.isNaN(Number((right as StringValue).value)))) throw new Error("Cannot add NaN string and a number");
+        return evaluateStringNumericBinaryExpression(left as StringValue | NumberValue, right as StringValue | NumberValue, binExp.operator);
     }
     return MAKE_NULL();
 }

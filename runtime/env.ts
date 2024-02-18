@@ -9,7 +9,7 @@ export function createGlobalEnvironment() {
 
     // Add built-in functions
     env.define("print", MAKE_NATIVE_FUNCTION((args) => {
-        console.log(...args);
+        console.log(...args.map(arg => arg.value));
         return MAKE_NULL();
     }), true);
 
@@ -26,7 +26,7 @@ export default class Environment {
     private constants: Set<string>;
 
     constructor(parentEnv?: Environment) {
-        const global = parentEnv ? true: false;
+        // const global = parentEnv ? true: false;
         this.parent = parentEnv;
         this.variables = new Map();
         this.constants = new Set();

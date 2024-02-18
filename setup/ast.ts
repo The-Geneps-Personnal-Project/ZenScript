@@ -9,6 +9,7 @@ export type NodeType =
     | 'Property'
     | 'ObjectLiteral'
     | 'NumericLiteral'
+    | 'StringLiteral'
     | 'Identifier'
     | 'BinaryExpression'
 
@@ -47,6 +48,11 @@ export interface Expression extends Statement {}
 export interface NumericLiteral extends Expression {
     kind: 'NumericLiteral';
     value: Number;
+}
+
+export interface StringLiteral extends Expression {
+    kind: 'StringLiteral';
+    value: string;
 }
 
 export interface Identifier extends Expression {

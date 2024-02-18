@@ -2,6 +2,7 @@ export enum TokenType {
     // LITERALS
     Number,
     Identifier,
+    String,
 
     // KEYWORDS
     Let, 
@@ -67,6 +68,10 @@ export class Lexer {
         return /[a-z]/i.test(char);
     }
 
+    private isString(char: string): boolean {
+        return /['"]/.test(char);
+    }
+
     private isOperator(char: string): boolean {
         return /[-+*/%]/.test(char);
     }
@@ -128,6 +133,16 @@ export class Lexer {
             else if (this.isOperator(this.peek())) {
                 const operator = this.consumeOperator();
                 this.tokens.push({ type: TokenType.BinaryOperator, value: operator });
+            }
+
+            else if (this.isString(this.peek())) {
+                const quote = this.advance();
+                let string = '';
+                while (this.peek() !== quote) {
+                    string += this.advance();
+                }
+                this.advance();
+                this.tokens.push({ type: TokenType.String, value: string });
             }
 
             else if (this.peek() === '=') {this.advance(); this.tokens.push({ type: TokenType.Equals, value: "="})}
