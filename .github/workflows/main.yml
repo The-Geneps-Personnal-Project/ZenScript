@@ -15,6 +15,11 @@ jobs:
       - name: Push to mirror
         run: |
           git remote add mirror https://github.com/The-Geneps-Personnal-Project/ZenScript.git
-          git push mirror ${GITHUB_REF:11} --force
+          if git ls-remote --heads mirror ${{ github.ref_name }} | grep -q refs/heads/${{ github.ref_name }}
+          then
+            git push mirror ${{ github.ref_name }}
+          else
+            git push --set-upstream mirror ${{ github.ref_name }}
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.MIRROR_PAT }}
