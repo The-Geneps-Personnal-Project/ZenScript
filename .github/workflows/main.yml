@@ -1,0 +1,25 @@
+name: Mirror Repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Push to mirror
+        run: |
+          git remote add mirror https://github.com/The-Geneps-Personnal-Project/ZenScript.git
+          if git ls-remote --heads mirror ${{ github.ref_name }} | grep -q refs/heads/${{ github.ref_name }}
+          then
+            git push mirror ${{ github.ref_name }}
+          else
+            git push --set-upstream mirror ${{ github.ref_name }}
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.MIRROR_PAT }}
