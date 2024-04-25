@@ -24,3 +24,5 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.MIRROR_PAT }}
+      - permissions:
+          contents: write
