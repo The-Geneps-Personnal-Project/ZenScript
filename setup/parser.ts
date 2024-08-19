@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 import {Token, TokenType, Lexer} from './lexer.ts';
 import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression, Property, ObjectLiteral, MemberExpression, StringLiteral, BooleanLiteral} from './ast.ts';
 
