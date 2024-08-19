@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
 import {Token, TokenType, Lexer} from './lexer.ts';
-import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression, Property, ObjectLiteral, MemberExpression, StringLiteral} from './ast.ts';
+import {Program, Statement, NumericLiteral, Identifier, CallExpression, FunctionDeclaration, Expression, BinaryExpression, VariablesDeclaration, AssignmentExpression, Property, ObjectLiteral, MemberExpression, StringLiteral, BooleanLiteral} from './ast.ts';
 
 export default class Parser {
     private tokens: Token[] = [];
@@ -21,7 +21,7 @@ export default class Parser {
         const prev = this.consume() as Token;
         if (!prev || prev.type != type) {
             console.error("Parser error: " + error + " at " + prev.value, "Expected: " + type);
-            Deno.exit(1);
+            process.exit(1);
         }
 
         return prev;
@@ -119,7 +119,6 @@ export default class Parser {
                 properties.push({kind: "Property", key} as Property);
                 continue;
             }
-
             this.expect(TokenType.Colon, "Expected colon after Identifier in Object Literal");
             const value = this.parse_expression(); // Allow any expression as value
 
@@ -141,6 +140,59 @@ export default class Parser {
             const value = this.parse_assignment_expression();
             return {value, assign: left, kind: "AssignmentExpression"} as AssignmentExpression;
         }
+        return left;
+    }
+
+    private parse_logical_expression(): Expression {
+        return this.parse_logical_or_expression();
+    }
+
+    private parse_logical_or_expression(): Expression {
+        let left = this.parse_logical_and_expression();
+
+        while (this.at().type == TokenType.LogicalOr) {
+            const operator = this.consume().value;
+            const right = this.parse_logical_and_expression();
+            left = { kind: "BinaryExpression", operator, left, right } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_logical_and_expression(): Expression {
+        let left = this.parse_equality_expression();
+
+        while (this.at().type == TokenType.LogicalAnd) {
+            const operator = this.consume().value;
+            const right = this.parse_equality_expression();
+            left = { kind: "BinaryExpression", operator, left, right } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_equality_expression(): Expression {
+        let left = this.parse_relational_expression();
+
+        while (this.at().type == TokenType.DoubleEquals || this.at().type == TokenType.NotEquals) {
+            const operator = this.consume().value;
+            const right = this.parse_relational_expression();
+            left = { kind: "BinaryExpression", operator, left, right } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_relational_expression(): Expression {
+        let left = this.parse_additive_expression();
+
+        while (this.at().type == TokenType.LessThan || this.at().type == TokenType.GreaterThan ||
+            this.at().type == TokenType.LessThanOrEqual || this.at().type == TokenType.GreaterThanOrEqual) {
+            const operator = this.consume().value;
+            const right = this.parse_additive_expression();
+            left = { kind: "BinaryExpression", operator, left, right } as BinaryExpression;
+        }
+
         return left;
     }
 
@@ -239,6 +291,8 @@ export default class Parser {
                 return { kind: "NumericLiteral", value: parseFloat(this.consume().value) } as NumericLiteral;
             case TokenType.String:
                 return { kind: "StringLiteral", value: this.consume().value } as StringLiteral;
+            case TokenType.Boolean:
+                return { kind: "BooleanLiteral", value: this.consume().value == "1" } as BooleanLiteral;
             case TokenType.OpenParen:
                 this.consume();
                 const expression = this.parse_expression();
@@ -249,7 +303,7 @@ export default class Parser {
                 return expression;
             default:
                 console.error("Unexpected token: " + JSON.stringify(this.at()));
-                Deno.exit(1);
+                process.exit(1);
         }
     }
 }

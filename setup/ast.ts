@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 export type NodeType = 
     // STATEMENTS
     | 'Program'
@@ -12,6 +11,7 @@ export type NodeType =
     | 'StringLiteral'
     | 'Identifier'
     | 'BinaryExpression'
+    | 'BooleanLiteral'
 
     // EXPRESSIONS & STATEMENTS
     | 'AssignmentExpression'
@@ -53,6 +53,12 @@ export interface NumericLiteral extends Expression {
 export interface StringLiteral extends Expression {
     kind: 'StringLiteral';
     value: string;
+}
+
+export interface BooleanLiteral extends Expression {
+    kind: 'BooleanLiteral';
+    value: boolean;
+
 }
 
 export interface Identifier extends Expression {

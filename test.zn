@@ -1,15 +1,22 @@
-
 const obj = {
   name: "John",
   age: 30,
-  isMarried: false
+  isMarried: True,
+  wife: {
+    name: "Jane",
+    age: 25
+  },
 };
+# This is # a comment to be ignored
+function test() {
+  print("hello")
+}
 
-obj.print = function() {
-  console.log("Hello");
-};
+let foo = 50;
+print(foo)
 
-obj.print()
-print(Str("Salut"))
+print(Str(12))
 print(Number("12"))
-print(typeof(true))
+print(typeof(test))
+print(obj.wife.name)
+test()
