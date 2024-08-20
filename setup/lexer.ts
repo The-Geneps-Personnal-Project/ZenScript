@@ -85,6 +85,10 @@ export class Lexer {
         return /\d/.test(char);
     }
 
+    private isFloat(char: string): boolean {
+        return /\d/.test(char) || char === '.';
+    }
+
     private isLetter(char: string): boolean {
         return /[a-zA-Z]/i.test(char);
     }
@@ -124,7 +128,7 @@ export class Lexer {
 
     private consumeNumber(): string {
         let result = '';
-        while (this.isDigit(this.peek())) {
+        while (this.isDigit(this.peek()) || this.peek() === '.') {
             result += this.advance();
         }
         return result;
@@ -208,7 +212,7 @@ export class Lexer {
                 continue;
             }
 
-            if (this.isDigit(this.peek())) {
+            if (this.isDigit(this.peek()) || this.isFloat(this.peek())) {
                 const digit = this.consumeNumber();
                 this.tokens.push({ type: TokenType.Number, value: digit });
                 continue;
